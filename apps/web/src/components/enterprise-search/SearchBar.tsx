@@ -1,4 +1,7 @@
 import { Search, Send, X } from "lucide-react";
+import { useState, type KeyboardEvent } from "react";
+
+import { useSearch } from "@/context/useSearch";
 
 interface SearchBarProps {
   query: string;
@@ -7,7 +10,27 @@ interface SearchBarProps {
   accent: string;
 }
 
-export default function SearchBar({ query, onQueryChange, onClear, accent }: SearchBarProps) {
+export default function SearchBar({ onQueryChange, onClear, accent }: SearchBarProps) {
+    const [query, setQuery] = useState<string>("");
+    const { sendQuery, isStreaming } = useSearch();
+
+    async function sendSearchQuery(message: string) {
+    const trimmed = message.trim();
+
+    if (!trimmed || isStreaming) return;
+
+    onQueryChange(trimmed);
+    await sendQuery(trimmed);
+  }
+
+  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      sendSearchQuery(query);
+      setQuery("");
+    }
+  }
+
   return (
     <div className="flex-none px-7 pt-[26px]">
       <div className="relative mx-auto max-w-[760px]">
@@ -16,7 +39,8 @@ export default function SearchBar({ query, onQueryChange, onClear, accent }: Sea
         </span>
         <input
           value={query}
-          onChange={(e) => onQueryChange(e.target.value)}
+          onKeyDown={(e) => handleKeyDown(e)}
+          onChange={(e) => setQuery(e.target.value)}
           placeholder="Search or ask anything across your tools…"
           autoFocus
           className="h-[58px] w-full rounded-full border border-border bg-background pr-[180px] pl-[54px] text-[16px] text-foreground shadow-[0_2px_10px_rgba(24,24,27,0.05),0_1px_2px_rgba(24,24,27,0.04)] outline-none focus:border-foreground focus:shadow-[0_0_0_4px_rgba(24,24,27,0.06),0_2px_10px_rgba(24,24,27,0.06)]"
@@ -32,6 +56,8 @@ export default function SearchBar({ query, onQueryChange, onClear, accent }: Sea
           </button>
           <button
             type="button"
+            onClick={() => sendSearchQuery(query)}
+            disabled={!query.trim() || isStreaming}
             className="flex h-10 items-center gap-[7px] rounded-full pr-4 pl-3.5 text-[13.5px] font-medium text-white transition-opacity hover:opacity-90"
             style={{ background: accent }}
           >

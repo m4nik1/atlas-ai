@@ -9,7 +9,9 @@ export default function EmptyState({ query }: { query: string }) {
       <div className="mb-[5px] text-[15px] font-medium text-foreground/80">
         No results for “{query}”
       </div>
-      <div className="text-[13.5px]">Try a different term or check another integration.</div>
+      <div className="text-[13.5px]">
+        Try a different term or check another integration.
+      </div>
     </div>
   );
 }

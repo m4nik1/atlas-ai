@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 
+import { SearchProvider } from "@/context/useSearch";
 import About from "../pages/About";
 import EnterpriseSearch from "../pages/EnterpriseSearch";
 import Home from "../pages/Home";
@@ -16,7 +17,11 @@ export const router = createBrowserRouter([
   },
   {
     path: "/search",
-    element: <EnterpriseSearch />,
+    element: (
+      <SearchProvider>
+        <EnterpriseSearch />
+      </SearchProvider>
+    ),
   },
   {
     path: "*",

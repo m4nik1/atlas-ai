@@ -1,4 +1,5 @@
 import { Search, Send } from "lucide-react";
+import type { KeyboardEvent } from "react";
 
 import { PROMPTS, SOURCE_META, monoTileStyle } from "@/lib/enterprise-search/data";
 
@@ -6,6 +7,7 @@ interface SearchHeroProps {
   query: string;
   onQueryChange: (value: string) => void;
   onPromptClick: (prompt: string) => void;
+  onSubmit: (value: string) => void;
   accent: string;
 }
 
@@ -13,8 +15,16 @@ export default function SearchHero({
   query,
   onQueryChange,
   onPromptClick,
+  onSubmit,
   accent,
 }: SearchHeroProps) {
+  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      onSubmit(query);
+    }
+  }
+
   return (
     <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-7 pt-10 pb-20">
       <div className="flex w-full max-w-[680px] flex-col items-center">
@@ -38,6 +48,7 @@ export default function SearchHero({
           </span>
           <input
             value={query}
+            onKeyDown={handleKeyDown}
             onChange={(e) => onQueryChange(e.target.value)}
             placeholder="Search or ask anything across your tools…"
             autoFocus
@@ -46,6 +57,7 @@ export default function SearchHero({
           <div className="absolute top-1/2 right-[9px] flex -translate-y-1/2 items-center gap-[7px]">
             <button
               type="button"
+              onClick={() => onSubmit(query)}
               className="flex h-[42px] items-center gap-[7px] rounded-full pr-[17px] pl-[15px] text-[13.5px] font-medium text-white transition-opacity hover:opacity-90"
               style={{ background: accent }}
             >

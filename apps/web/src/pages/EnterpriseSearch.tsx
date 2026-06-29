@@ -10,6 +10,7 @@ import {
   SuggestedTasks,
 } from "@/components/enterprise-search";
 import type { TabView } from "@/components/enterprise-search";
+import { useSearch } from "@/context/useSearch";
 import { AI_ANSWER, RESULTS, TAB_DEFS } from "@/lib/enterprise-search/data";
 import type { TabId } from "@/lib/enterprise-search/data";
 
@@ -26,6 +27,7 @@ export default function EnterpriseSearch({
 }: EnterpriseSearchProps) {
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState<TabId>("all");
+  const { searchResults, isStreaming, sendQuery } = useSearch();
 
   const q = query.trim().toLowerCase();
   const isSearching = q.length > 0;
@@ -48,12 +50,21 @@ export default function EnterpriseSearch({
 
   const results = tab === "all" ? matched : matched.filter((r) => r.cat === tab);
   const hasResults = results.length > 0;
-  const showAi = aiAnswer && isSearching && hasResults;
+  const showAi = aiAnswer && isSearching && (hasResults || isStreaming || searchResults);
   const resultCountLabel = `${results.length} ${results.length === 1 ? "result" : "results"}`;
 
   const handleQueryChange = (value: string) => {
     setQuery(value);
     setTab("all");
+  };
+
+  const handleQuerySubmit = (value: string) => {
+    const trimmed = value.trim();
+
+    if (!trimmed) return;
+
+    handleQueryChange(trimmed);
+    void sendQuery(trimmed);
   };
 
   return (
@@ -66,7 +77,8 @@ export default function EnterpriseSearch({
           <SearchHero
             query={query}
             onQueryChange={handleQueryChange}
-            onPromptClick={handleQueryChange}
+            onPromptClick={handleQuerySubmit}
+            onSubmit={handleQuerySubmit}
             accent={accentColor}
           />
         ) : (

@@ -7,6 +7,8 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
+    "server": "npm --prefix apps/server run dev",
+    "web": "npm --prefix apps/web run dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

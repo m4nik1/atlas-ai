@@ -1,5 +1,6 @@
 import { Sparkles } from "lucide-react";
 
+import { useSearch } from "@/context/useSearch";
 import type { SearchResult } from "@/lib/enterprise-search/data";
 import { monoTileStyle } from "@/lib/enterprise-search/data";
 
@@ -10,21 +11,28 @@ interface AiAnswerProps {
 }
 
 export default function AiAnswer({ answer, citations, accent }: AiAnswerProps) {
+  const { searchResults, isStreaming, metrics } = useSearch();
+  const displayedAnswer =
+    searchResults || (isStreaming ? "Thinking..." : answer);
+
   return (
     <div className="mb-[22px] border-b border-border px-0 pt-0.5 pb-[22px]">
       <div className="mb-3 flex items-center gap-[9px]">
         <span className="flex" style={{ color: accent }}>
           <Sparkles size={16} fill="currentColor" strokeWidth={0} />
         </span>
-        <span className="text-[13px] font-semibold tracking-tight">AI Answer</span>
-        <span
-          className="rounded-[5px] border border-border bg-background px-1.5 py-0.5 text-[10px] text-muted-foreground"
-          style={{ fontFamily: "var(--font-geist-mono)" }}
-        >
-          synthesized · 7 sources
+        <span className="text-[13px] font-semibold tracking-tight">
+          AI Answer
         </span>
       </div>
-      <p className="m-0 text-[14.5px] leading-[1.65] text-foreground/80 text-pretty">{answer}</p>
+      <p className="m-0 text-[14.5px] leading-[1.65] text-foreground/80 text-pretty">
+        {displayedAnswer}
+      </p>
+      {!isStreaming && metrics && (
+        <p className="mt-2 text-[11px] text-muted-foreground/60">
+          {metrics.tokensPerSecond.toLocaleString()} tokens/sec • {metrics.queryTimeMs}ms
+        </p>
+      )}
       <div className="mt-3.5 flex flex-wrap gap-[7px]">
         {citations.map((citation) => (
           <span
