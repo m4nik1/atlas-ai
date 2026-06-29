@@ -1,4 +1,5 @@
 import { Sparkles } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 import { useSearch } from "@/context/useSearch";
 import type { SearchResult } from "@/lib/enterprise-search/data";
@@ -25,9 +26,66 @@ export default function AiAnswer({ answer, citations, accent }: AiAnswerProps) {
           AI Answer
         </span>
       </div>
-      <p className="m-0 text-[14.5px] leading-[1.65] text-foreground/80 text-pretty">
-        {displayedAnswer}
-      </p>
+      <div className="text-[14.5px] leading-[1.65] text-foreground/80 text-pretty">
+        <ReactMarkdown
+          components={{
+            p: ({ children }) => <p className="m-0 mb-3 last:mb-0">{children}</p>,
+            strong: ({ children }) => (
+              <strong className="font-semibold text-foreground/90">{children}</strong>
+            ),
+            em: ({ children }) => <em className="text-foreground/85">{children}</em>,
+            a: ({ children, href }) => (
+              <a
+                className="font-medium underline decoration-foreground/25 underline-offset-3 hover:text-foreground"
+                href={href}
+                rel="noreferrer"
+                target="_blank"
+              >
+                {children}
+              </a>
+            ),
+            ul: ({ children }) => <ul className="my-3 list-disc space-y-1 pl-5">{children}</ul>,
+            ol: ({ children }) => <ol className="my-3 list-decimal space-y-1 pl-5">{children}</ol>,
+            li: ({ children }) => <li className="pl-1">{children}</li>,
+            h1: ({ children }) => (
+              <h1 className="mt-4 mb-2 text-[18px] font-semibold text-foreground first:mt-0">
+                {children}
+              </h1>
+            ),
+            h2: ({ children }) => (
+              <h2 className="mt-4 mb-2 text-[16px] font-semibold text-foreground first:mt-0">
+                {children}
+              </h2>
+            ),
+            h3: ({ children }) => (
+              <h3 className="mt-3 mb-1.5 text-[15px] font-semibold text-foreground first:mt-0">
+                {children}
+              </h3>
+            ),
+            blockquote: ({ children }) => (
+              <blockquote className="my-3 border-l-2 border-border pl-3 text-muted-foreground">
+                {children}
+              </blockquote>
+            ),
+            code: ({ children, className }) => {
+              const isBlock = Boolean(className);
+
+              return isBlock ? (
+                <code className={`${className} block overflow-x-auto rounded-lg border border-border bg-muted px-3 py-2 text-[13px] leading-relaxed text-foreground`}>
+                  {children}
+                </code>
+              ) : (
+                <code className="rounded bg-muted px-1 py-0.5 text-[13px] text-foreground">
+                  {children}
+                </code>
+              );
+            },
+            pre: ({ children }) => <pre className="my-3 overflow-x-auto">{children}</pre>,
+          }}
+        >
+          {displayedAnswer}
+        </ReactMarkdown>
+      </div>
       {!isStreaming && metrics && (
         <p className="mt-2 text-[11px] text-muted-foreground/60">
           {metrics.tokensPerSecond.toLocaleString()} tokens/sec • {metrics.queryTimeMs}ms
